@@ -6,6 +6,6 @@ class DevelopmentConfig():
     MYSQL_DB = 'agenda'
 
 
-config = {
+configuracion = {
     'development': DevelopmentConfig
 }

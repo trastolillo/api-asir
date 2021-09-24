@@ -1,7 +1,5 @@
 from flask import request, jsonify
-from app import app, mysql
-
-probando = True
+from src import app, mysql
 
 
 @app.get('/modulos')
