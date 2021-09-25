@@ -1,3 +1,4 @@
+import MySQLdb
 from flask import request, jsonify
 from src import app, mysql
 
@@ -16,6 +17,9 @@ def listar_modulos():
                           'modulo': fila[1], 'url': fila[2]}
                 modulos.append(modulo)
         return jsonify(modulos)
+    except (MySQLdb.Error, MySQLdb.Warning) as ex:
+        print(f"********** Error: {ex}")
+        return jsonify({'Error': str(ex)})
     except Exception as ex:
         return jsonify({'Error': ex.with_traceback})
 
@@ -46,8 +50,11 @@ def agregar_modulo():
         cursor.execute(sql)
         mysql.connection.commit()
         return jsonify({"resultado": "Módulo registrado"})
+    except (MySQLdb.Error, MySQLdb.Warning) as ex:
+        print(f"********** Error: {ex}")
+        return jsonify({'Error': str(ex)})
     except Exception as ex:
-        return jsonify({'Error': 'Error agregando el módulo'})
+        return jsonify({'Error': ex.with_traceback})
 
 
 @app.delete('/modulo/<id>')
@@ -59,8 +66,11 @@ def eliminar_modulo(id):
         mysql.connection.commit()
         # TODO: Cuando borras registro que no existe, retorna éxito
         return ({"resultado": "Curso eliminado"})
+    except (MySQLdb.Error, MySQLdb.Warning) as ex:
+        print(f"********** Error: {ex}")
+        return jsonify({'Error': str(ex)})
     except Exception as ex:
-        return jsonify({'Error': 'Error eliminando'})
+        return jsonify({'Error': ex.with_traceback})
 
 
 @app.put('/modulo/<id>')
@@ -75,5 +85,8 @@ def actualizar_modulo(id):
         cursor.execute(sql)
         mysql.connection.commit()
         return jsonify({"resultado": "Curso actualizado"})
+    except (MySQLdb.Error, MySQLdb.Warning) as ex:
+        print(f"********** Error: {ex}")
+        return jsonify({'Error': str(ex)})
     except Exception as ex:
-        return jsonify({'Error': ex})
+        return jsonify({'Error': ex.with_traceback})

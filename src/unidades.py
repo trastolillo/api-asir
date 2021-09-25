@@ -3,28 +3,24 @@ from flask import request, jsonify
 from src import app, mysql
 
 
-@app.get('/tareas')
-def listar_tareas():
+@app.get('/unidades')
+def listar_unidades():
     cursor = mysql.connection.cursor()
     try:
-        sql = "select * from view_tareas"
+        sql = "select * from unidades"
         cursor.execute(sql)
         datos = cursor.fetchall()
-        tareas = []
+        unidades = []
         if datos != None:
             for fila in datos:
-                tarea = {
+                unidad = {
                     'id_modulo': fila[0],
-                    'modulo': fila[1],
-                    'unidad': fila[2],
-                    'titulo': fila[3],
-                    'tipo': fila[4],
-                    'fecha_limite': fila[5],
-                    'fecha_terminado': fila[6],
-                    'url': fila[7]
+                    'unidad': fila[1],
+                    'titulo': fila[2],
+                    'url': fila[3]
                 }
-                tareas.append(tarea)
-        return jsonify(tareas)
+                unidades.append(unidad)
+        return jsonify(unidades)
     except (MySQLdb.Error, MySQLdb.Warning) as ex:
         print(f"********** Error: {ex}")
         return jsonify({'Error': str(ex)})
@@ -32,25 +28,21 @@ def listar_tareas():
         return jsonify({'Error': ex.with_traceback})
 
 
-@app.get('/tarea/<id_modulo>/<unidad>/<tipo>')
-def listar_tarea(id_modulo: str, unidad: int, tipo: str):
+@app.get('/unidad/<id_modulo>/<unidad>')
+def listar_unidad(id_modulo: str, unidad: int):
     try:
         cursor = mysql.connection.cursor()
-        sql = 'select * from view_tareas where id_modulo = "{0}" and unidad={1} and tipo ="{2}"'.format(
-            id_modulo, unidad, tipo)
+        sql = 'select * from unidades where id_modulo = "{0}" and unidad={1}'.format(
+            id_modulo, unidad)
         cursor.execute(sql)
         datos = cursor.fetchone()
-        tarea = {
+        unidad = {
             'id_modulo': datos[0],
-            'modulo': datos[1],
-            'unidad': datos[2],
-            'titulo': datos[3],
-            'tipo': datos[4],
-            'fecha_limite': datos[5],
-            'fecha_terminado': datos[6],
-            'url': datos[7]
+            'unidad': datos[1],
+            'titulo': datos[2],
+            'url': datos[3]
         }
-        return jsonify(tarea)
+        return jsonify(unidad)
     except (MySQLdb.Error, MySQLdb.Warning) as ex:
         print(f"********** Error: {ex}")
         return jsonify({'Error': str(ex)})
@@ -58,20 +50,19 @@ def listar_tarea(id_modulo: str, unidad: int, tipo: str):
         return jsonify({'Error': ex.with_traceback})
 
 
-@app.post('/tarea')
-def agregar_tarea():
-    cursor = mysql.connection.cursor()
+@app.post('/unidad')
+def agregar_unidad():
     try:
-        sql = 'insert into tareas (id_modulo, unidad, tipo, fecha_limite) values ("{0}", {1}, "{2}", "{3}")'.format(
+        cursor = mysql.connection.cursor()
+        sql = 'insert into unidades values ("{0}", {1}, "{2}", "{3}")'.format(
             request.json['id_modulo'],
             request.json['unidad'],
-            request.json['tipo'],
-            request.json['fecha_limite']
+            request.json['titulo'],
+            request.json['url']
         )
         cursor.execute(sql)
         mysql.connection.commit()
-
-        return jsonify({"resultado": "Tarea registrada"})
+        return jsonify({"resultado": "Unidad registrada"})
     except (MySQLdb.Error, MySQLdb.Warning) as ex:
         print(f"********** Error: {ex}")
         return jsonify({'Error': str(ex)})
@@ -79,12 +70,12 @@ def agregar_tarea():
         return jsonify({'Error': ex.with_traceback})
 
 
-@app.put('/fin/<id_modulo>/<unidad>/<tipo>')
-def finalizar_tarea(id_modulo: str, unidad: int, tipo: str):
+@app.put('/unidadurl/<id_modulo>/<unidad>')
+def actualizar_url_unidad(id_modulo: str, unidad: int):
     try:
         cursor = mysql.connection.cursor()
-        fecha_terminado = request.json['fecha_terminado']
-        sql = f'update tareas set fecha_terminado="{fecha_terminado}" where id_modulo="{id_modulo}" and unidad={unidad} and tipo="{tipo}"'
+        url = request.json['url']
+        sql = f'update unidades set url="{url}" where id_modulo="{id_modulo}" and unidad={unidad}'
         cursor.execute(sql)
         mysql.connection.commit()
         return jsonify({"resultado": "Curso actualizado"})
@@ -95,11 +86,11 @@ def finalizar_tarea(id_modulo: str, unidad: int, tipo: str):
         return jsonify({'Error': ex.with_traceback})
 
 
-@app.delete('/tarea/<id_modulo>/<unidad>/<tipo>')
-def eliminar_tarea(id_modulo: str, unidad: int, tipo: str):
+@app.delete('/unidad/<id_modulo>/<unidad>')
+def eliminar_unidad(id_modulo: str, unidad: int):
     try:
         cursor = mysql.connection.cursor()
-        sql = f'delete from tareas where id_modulo="{id_modulo}" and unidad={unidad} and tipo="{tipo}"'
+        sql = f'delete from unidades where id_modulo="{id_modulo}" and unidad={unidad}'
         cursor.execute(sql)
         mysql.connection.commit()
         # TODO: Cuando borras registro que no existe, retorna éxito

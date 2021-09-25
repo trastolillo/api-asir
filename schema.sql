@@ -1,3 +1,4 @@
+use agenda;
 create table if not exists modulos (
   id_modulo varchar(6) primary key not null,
   modulo varchar(200) not null,
@@ -110,7 +111,8 @@ select
   u.titulo,
   t.tipo,
   t.fecha_limite,
-  t.fecha_terminado
+  t.fecha_terminado,
+  u.url
 from
   tareas t
   join unidades u using(id_modulo, unidad)

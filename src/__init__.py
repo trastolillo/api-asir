@@ -12,4 +12,4 @@ def pagina_no_encontrada(error):
     return error
 
 
-from src import modulos
+from src import modulos, tareas, unidades
